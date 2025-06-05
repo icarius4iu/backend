@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pe.edu.utp.backend.util.Cicle;
 
 import java.time.LocalDateTime;
 
@@ -29,22 +28,35 @@ public class StudentProfile {
     @Column(name = "photo_url")
     private String photoUrl;
 
-    // Número de WhatsApp para contacto
-    @Column(name = "whatsapp_number")
-    private String whatsappNumber;
+    // Datos espejo de Student
+    @Column(name = "student_code")
+    private String studentCode;
 
-    // Nombre completo (para mostrar)
-    @Column(name = "display_name")
-    private String displayName;
+    @Column(name = "full_name")
+    private String fullName;
 
-    // DNI (documento de identidad)
-    @Column(name = "dni")
-    private String dni;
+    @Column(name = "status")
+    private String status;
 
-    // Ciclo actual del estudiante
-    @ManyToOne
-    @JoinColumn(name = "current_cicle_id")
-    private Cicle currentCicle;
+    @Column(name = "faculty")
+    private String faculty;
+
+    @Column(name = "modality")
+    private String modality;
+
+    // Datos espejo de StudentInformation
+    @Column(name = "document_type")
+    private String documentType;
+
+    @Column(name = "document_number")
+    private String documentNumber;
+
+    @Column(name = "mobile_phone")
+    private String mobilePhone;
+
+    @Column(name = "personal_email")
+    private String personalEmail;
+
 
     // Fecha de última actualización del perfil
     @Column(name = "last_updated")
@@ -66,5 +78,28 @@ public class StudentProfile {
         return photoUrl != null && !photoUrl.isEmpty()
                 ? photoUrl
                 : "/assets/images/default-profile.png";
+    }
+
+    /**
+     * Sincroniza los datos del perfil con Student y StudentInformation
+     * Este método debe llamarse cuando se crea o actualiza el perfil
+     */
+    public void syncFromStudent() {
+        if (student != null) {
+            this.studentCode = student.getStudentCode();
+            this.fullName = student.getFullName();
+            this.status = student.getStatus() != null ? student.getStatus().getDisplayName() : null;
+            this.faculty = student.getFaculty();
+            this.modality = student.getModality() != null ? student.getModality().getDisplayName() : null;
+
+            if (student.getInformation() != null) {
+                StudentInformation info = student.getInformation();
+                this.documentType = info.getDocumentType() != null ?
+                        info.getDocumentType().getDisplayName() : null;
+                this.documentNumber = info.getDocumentNumber();
+                this.mobilePhone = info.getMobilePhone();
+                this.personalEmail = info.getPersonalEmail();
+            }
+        }
     }
 }
