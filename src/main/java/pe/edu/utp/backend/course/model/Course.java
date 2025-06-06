@@ -1,13 +1,10 @@
 package pe.edu.utp.backend.course.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import pe.edu.utp.backend.career.model.Career;
+import lombok.*;
+import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.content.model.Content;
-import pe.edu.utp.backend.util.Cicle;
+import pe.edu.utp.backend.util.cicle.Cicle;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,10 +13,13 @@ import java.util.Set;
 
 @Entity
 @Table(name = "courses")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"careers", "sections", "contents"})
+@EqualsAndHashCode(exclude = {"careers", "sections", "contents"})
 public class Course {
     /**
      * Enum para representar los tipos de curso
@@ -89,9 +89,9 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<Section> sections = new HashSet<>();
+
     @OneToMany(mappedBy = "course")
     private List<Content> contents = new ArrayList<>();
-
 
     /**
      * Determina si el curso tiene asistencia presencial o en tiempo real

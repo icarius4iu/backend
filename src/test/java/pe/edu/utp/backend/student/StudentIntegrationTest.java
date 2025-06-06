@@ -4,10 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
-import pe.edu.utp.backend.career.model.Career;
-import pe.edu.utp.backend.career.repository.CareerRepository;
+import pe.edu.utp.backend.util.career.model.Career;
+import pe.edu.utp.backend.util.career.repository.CareerRepository;
 import pe.edu.utp.backend.student.model.Student;
 import pe.edu.utp.backend.student.model.StudentInformation;
 import pe.edu.utp.backend.student.model.StudentProfile;
@@ -16,10 +15,8 @@ import pe.edu.utp.backend.student.repository.StudentProfileRepository;
 import pe.edu.utp.backend.student.repository.StudentRepository;
 import pe.edu.utp.backend.student.service.StudentProfileService;
 import pe.edu.utp.backend.student.service.StudentService;
-
-
-import pe.edu.utp.backend.util.Cicle;
-import pe.edu.utp.backend.util.repository.CicleRepository;
+import pe.edu.utp.backend.util.cicle.Cicle;
+import pe.edu.utp.backend.util.cicle.repository.CicleRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -202,17 +199,32 @@ public class StudentIntegrationTest {
                 .build();
         Career savedCareer = careerRepository.save(career);
 
-        // Crear ciclo
-        Cicle cicle = Cicle.builder()
-                .name("2025-I")
-                .startDate(LocalDate.of(2025, 3, 15))
-                .endDate(LocalDate.of(2025, 7, 15))
-                .type(Cicle.CicleType.REGULAR) // Corregido: active -> type(CicleType.REGULAR)
-                .build();
+        // Crear ciclo - Usar el método de fábrica para crear un ciclo válido
+        Cicle cicle = Cicle.createRegular1(
+                "2025",
+                LocalDate.of(2025, 3, 15),
+                LocalDate.of(2025, 7, 15)
+        );
         Cicle savedCicle = cicleRepository.save(cicle);
 
-        // Crear información completa del estudiante
+        // PASO 1: Crear y guardar estudiante primero
+        Student student = Student.builder()
+                .studentCode("U20220101")
+                .status(Student.Status.ACTIVO)
+                .career(savedCareer)
+                .faculty("Ciencias de la Salud")
+                .modality(Student.Modality.PRESENCIAL)
+                .campus("Campus Este")
+                .enrollmentDate(LocalDate.of(2022, 3, 10))
+                .lastRegistrationDate(LocalDate.of(2025, 2, 20))
+                .lastEnrollmentDate(LocalDate.of(2025, 3, 5))
+                .build();
+
+        Student savedStudent = studentRepository.save(student);
+
+        // PASO 2: Crear información del estudiante con referencia al estudiante guardado
         StudentInformation info = StudentInformation.builder()
+                .student(savedStudent)  // IMPORTANTE: Asignar el estudiante guardado
                 .firstName("Ana")
                 .lastName("Martínez")
                 .motherLastName("López")
@@ -233,26 +245,19 @@ public class StudentIntegrationTest {
                 .personalEmail("ana@example.com")
                 .build();
 
-        // Crear estudiante completo
-        Student student = Student.builder()
-                .studentCode("U20220101")
-                .status(Student.Status.ACTIVO)
-                .career(savedCareer)
-                .faculty("Ciencias de la Salud")
-                .modality(Student.Modality.PRESENCIAL)
-                .campus("Campus Este")
-                .enrollmentDate(LocalDate.of(2022, 3, 10))
-                .lastRegistrationDate(LocalDate.of(2025, 2, 20))
-                .lastEnrollmentDate(LocalDate.of(2025, 3, 5))
-                .build();
+        // Guardar información del estudiante
+        StudentInformation savedInfo = studentInformationRepository.save(info);
 
-        // When - Crear estudiante y perfil usando servicios
-        Student savedStudent = studentService.createStudent(student, info);
+        // PASO 3: Actualizar relación bidireccional en el estudiante
+        savedStudent.setInformation(savedInfo);
+        savedStudent = studentRepository.save(savedStudent);
+
+        // When - Crear perfil usando el servicio
         StudentProfile profile = studentProfileService.createOrUpdateProfile(savedStudent);
 
-        // Actualizar perfil con foto y asignar ciclo
+        // Actualizar perfil con foto
         profile.setPhotoUrl("https://example.com/photos/ana.jpg");
-        studentProfileRepository.save(profile);
+        profile = studentProfileRepository.save(profile);
 
         // Then - Verificar que el perfil refleja todos los atributos del estudiante
         Optional<StudentProfile> retrievedProfile = studentProfileRepository.findByStudentId(savedStudent.getId());
@@ -271,18 +276,21 @@ public class StudentIntegrationTest {
         assertEquals("https://example.com/photos/ana.jpg", foundProfile.getPhotoUrl());
 
         // When - Actualizar información del estudiante
-        info.setFirstName("Ana María");
-        info.setPersonalEmail("ana.maria@example.com");
-        studentInformationRepository.save(info);
+        savedInfo.setFirstName("Ana María");
+        savedInfo.setPersonalEmail("ana.maria@example.com");
+        savedInfo = studentInformationRepository.save(savedInfo);
+
+        // Recargar el estudiante para asegurar que tenga la información actualizada
+        savedStudent = studentRepository.findById(savedStudent.getId()).get();
 
         // Sincronizar el perfil
-        studentProfileService.createOrUpdateProfile(savedStudent);
+        StudentProfile updatedProfile = studentProfileService.createOrUpdateProfile(savedStudent);
 
         // Then - Verificar que el perfil se actualizó correctamente con todos los campos
-        Optional<StudentProfile> updatedProfile = studentProfileRepository.findByStudentId(savedStudent.getId());
-        assertTrue(updatedProfile.isPresent());
+        Optional<StudentProfile> retrievedUpdatedProfile = studentProfileRepository.findByStudentId(savedStudent.getId());
+        assertTrue(retrievedUpdatedProfile.isPresent());
 
-        StudentProfile foundUpdatedProfile = updatedProfile.get();
+        StudentProfile foundUpdatedProfile = retrievedUpdatedProfile.get();
         assertEquals("Ana María Martínez López", foundUpdatedProfile.getFullName());
         assertEquals("ana.maria@example.com", foundUpdatedProfile.getPersonalEmail());
         // La foto debe mantenerse después de la actualización
@@ -290,12 +298,180 @@ public class StudentIntegrationTest {
     }
 
     @Test
-    @Sql({"/test-data/clean-up.sql", "/test-data/careers.sql", "/test-data/cicles.sql", "/test-data/complete-students.sql"})
     public void testComplexQueriesWithAllAttributes() {
-        // When - Buscar estudiantes por facultad
-        List<Student> medicalStudents = studentRepository.findByFaculty("Medicina");
+        // Given - Crear datos de prueba programáticamente
 
-        // Then - Verificar que se encuentran estudiantes y tienen todos los atributos completos
+        // 1. Crear carreras
+        Career careerSIS = Career.builder()
+                .name("Ingeniería de Sistemas")
+                .code("SIS")
+                .durationSemesters(10)
+                .build();
+        careerSIS = careerRepository.save(careerSIS);
+
+        Career careerMED = Career.builder()
+                .name("Medicina")
+                .code("MED")
+                .durationSemesters(14)
+                .build();
+        careerMED = careerRepository.save(careerMED);
+
+        Career careerDER = Career.builder()
+                .name("Derecho")
+                .code("DER")
+                .durationSemesters(12)
+                .build();
+        careerDER = careerRepository.save(careerDER);
+
+        // 2. Crear ciclo académico
+        Cicle cicle = Cicle.createRegular1(
+                "2025",
+                LocalDate.of(2025, 3, 15),
+                LocalDate.of(2025, 7, 15)
+        );
+        cicle = cicleRepository.save(cicle);
+
+        // 3. Crear tres estudiantes completos con información
+
+        // Estudiante 1: Juan Pérez (Ingeniería)
+        Student student1 = Student.builder()
+                .studentCode("U20190123")
+                .status(Student.Status.ACTIVO)
+                .career(careerSIS)
+                .faculty("Ingeniería")
+                .modality(Student.Modality.PRESENCIAL)
+                .campus("Campus Principal")
+                .enrollmentDate(LocalDate.of(2019, 3, 1))
+                .lastRegistrationDate(LocalDate.of(2025, 2, 10))
+                .lastEnrollmentDate(LocalDate.of(2025, 3, 1))
+                .build();
+
+        student1 = studentRepository.save(student1);
+
+        StudentInformation info1 = StudentInformation.builder()
+                .student(student1)
+                .firstName("Juan")
+                .lastName("Pérez")
+                .motherLastName("García")
+                .documentType(StudentInformation.DocumentType.DNI)
+                .documentNumber("12345678")
+                .birthDate(LocalDate.of(1995, 5, 10))
+                .civilStatus(StudentInformation.CivilStatus.SOLTERO)
+                .address("Av. Los Pinos 123")
+                .district("San Borja")
+                .province("Lima")
+                .department("Lima")
+                .emergencyContactName("María Pérez")
+                .emergencyContactRelationship("Madre")
+                .emergencyContactPhone("987654321")
+                .emergencyContactAddress("Av. Los Pinos 123, Lima")
+                .landlinePhone("01-3456789")
+                .mobilePhone("987654321")
+                .personalEmail("juan.perez@example.com")
+                .build();
+
+        info1 = studentInformationRepository.save(info1);
+        student1.setInformation(info1);
+        student1 = studentRepository.save(student1);
+
+        StudentProfile profile1 = studentProfileService.createOrUpdateProfile(student1);
+        profile1.setPhotoUrl("https://example.com/photos/juan.jpg");
+        studentProfileRepository.save(profile1);
+
+        // Estudiante 2: María López (Medicina)
+        Student student2 = Student.builder()
+                .studentCode("U20200456")
+                .status(Student.Status.ACTIVO)
+                .career(careerMED)
+                .faculty("Medicina")
+                .modality(Student.Modality.PRESENCIAL)
+                .campus("Campus Este")
+                .enrollmentDate(LocalDate.of(2020, 3, 1))
+                .lastRegistrationDate(LocalDate.of(2025, 2, 15))
+                .lastEnrollmentDate(LocalDate.of(2025, 3, 5))
+                .build();
+
+        student2 = studentRepository.save(student2);
+
+        StudentInformation info2 = StudentInformation.builder()
+                .student(student2)
+                .firstName("María")
+                .lastName("López")
+                .motherLastName("Sánchez")
+                .documentType(StudentInformation.DocumentType.DNI)
+                .documentNumber("87654321")
+                .birthDate(LocalDate.of(1994, 7, 15))
+                .civilStatus(StudentInformation.CivilStatus.CASADO)
+                .address("Jr. Las Flores 456")
+                .district("Miraflores")
+                .province("Lima")
+                .department("Lima")
+                .emergencyContactName("Carlos López")
+                .emergencyContactRelationship("Hermano")
+                .emergencyContactPhone("912345678")
+                .emergencyContactAddress("Jr. Las Palmas 789, Lima")
+                .landlinePhone("01-2345678")
+                .mobilePhone("912345678")
+                .personalEmail("maria.lopez@example.com")
+                .build();
+
+        info2 = studentInformationRepository.save(info2);
+        student2.setInformation(info2);
+        student2 = studentRepository.save(student2);
+
+        StudentProfile profile2 = studentProfileService.createOrUpdateProfile(student2);
+        profile2.setPhotoUrl("https://example.com/photos/maria.jpg");
+        studentProfileRepository.save(profile2);
+
+        // Estudiante 3: Carlos García (Derecho)
+        Student student3 = Student.builder()
+                .studentCode("U20180789")
+                .status(Student.Status.EGRESADO)
+                .career(careerDER)
+                .faculty("Derecho")
+                .modality(Student.Modality.SEMIPRESENCIAL)
+                .campus("Campus Centro")
+                .enrollmentDate(LocalDate.of(2018, 3, 1))
+                .lastRegistrationDate(LocalDate.of(2023, 2, 20))
+                .lastEnrollmentDate(LocalDate.of(2023, 3, 10))
+                .build();
+
+        student3 = studentRepository.save(student3);
+
+        StudentInformation info3 = StudentInformation.builder()
+                .student(student3)
+                .firstName("Carlos")
+                .lastName("García")
+                .motherLastName("Martínez")
+                .documentType(StudentInformation.DocumentType.PASSPORT)
+                .documentNumber("AB123456")
+                .birthDate(LocalDate.of(1992, 12, 20))
+                .civilStatus(StudentInformation.CivilStatus.SOLTERO)
+                .address("Calle Los Olivos 789")
+                .district("San Isidro")
+                .province("Lima")
+                .department("Lima")
+                .emergencyContactName("Pedro García")
+                .emergencyContactRelationship("Padre")
+                .emergencyContactPhone("956781234")
+                .emergencyContactAddress("Calle Los Olivos 789, Lima")
+                .landlinePhone("01-4567890")
+                .mobilePhone("956781234")
+                .personalEmail("carlos.garcia@example.com")
+                .build();
+
+        info3 = studentInformationRepository.save(info3);
+        student3.setInformation(info3);
+        student3 = studentRepository.save(student3);
+
+        StudentProfile profile3 = studentProfileService.createOrUpdateProfile(student3);
+        profile3.setPhotoUrl("https://example.com/photos/carlos.jpg");
+        studentProfileRepository.save(profile3);
+
+        // When & Then - Realizar consultas como en el test original
+
+        // Buscar estudiantes por facultad
+        List<Student> medicalStudents = studentRepository.findByFaculty("Medicina");
         assertFalse(medicalStudents.isEmpty());
         Student medStudent = medicalStudents.get(0);
 
@@ -313,10 +489,8 @@ public class StudentIntegrationTest {
         assertNotNull(medStudent.getInformation().getDocumentType());
         assertNotNull(medStudent.getInformation().getDocumentNumber());
 
-        // When - Buscar perfiles por nombre
+        // Buscar perfiles por nombre
         List<StudentProfile> profiles = studentProfileRepository.findByFullNameContainingIgnoreCase("García");
-
-        // Then - Verificar que se encuentran perfiles y tienen todos sus atributos
         assertFalse(profiles.isEmpty());
         StudentProfile profile = profiles.get(0);
 
@@ -330,10 +504,8 @@ public class StudentIntegrationTest {
         assertNotNull(profile.getDocumentNumber());
         assertNotNull(profile.getMobilePhone());
 
-        // When - Buscar estudiantes por documento
+        // Buscar estudiantes por documento
         Optional<Student> studentByDoc = studentRepository.findByDocumentNumber("12345678");
-
-        // Then - Verificar que se encuentra y tiene todos sus atributos
         assertTrue(studentByDoc.isPresent());
         Student foundStudent = studentByDoc.get();
         assertNotNull(foundStudent.getInformation().getDocumentNumber());

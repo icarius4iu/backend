@@ -1,4 +1,4 @@
-package pe.edu.utp.backend.career.model;
+package pe.edu.utp.backend.util.career.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,9 @@
-package pe.edu.utp.backend.util.repository;
+package pe.edu.utp.backend.util.cicle.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import pe.edu.utp.backend.util.Cicle;
-import pe.edu.utp.backend.util.Cicle.CicleType;
+import pe.edu.utp.backend.util.cicle.Cicle;
+import pe.edu.utp.backend.util.cicle.Cicle.CicleType;
 
 import java.time.LocalDate;
 import java.util.List;

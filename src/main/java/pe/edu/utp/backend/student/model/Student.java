@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pe.edu.utp.backend.career.model.Career;
+import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.course.model.Section;
 import pe.edu.utp.backend.schedule.model.StudentSchedule;
 

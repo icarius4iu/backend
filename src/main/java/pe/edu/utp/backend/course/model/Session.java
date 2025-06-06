@@ -1,10 +1,7 @@
 package pe.edu.utp.backend.course.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pe.edu.utp.backend.content.model.Content;
 
 import java.time.DayOfWeek;
@@ -15,10 +12,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "sessions")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"week", "contents"})
+@EqualsAndHashCode(exclude = {"week", "contents"})
 public class Session {
 
     /**
@@ -73,12 +73,12 @@ public class Session {
     // Atributos para sesiones presenciales
     private String buildingName; // Nombre del edificio
 
-    private String roomNumber; // Número de aula/laboratorio
+    private String roomNumber; // Número de aulas/laboratorio
 
     // Atributos para sesiones virtuales
     private String meetingUrl; // URL de la reunión virtual
 
-    private String meetingId; // ID de la reunión
+    private String meetingId; // id de la reunión
 
     private String meetingPassword; // Contraseña de la reunión
 

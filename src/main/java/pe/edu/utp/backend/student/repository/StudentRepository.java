@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pe.edu.utp.backend.career.model.Career;
+import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.student.model.Student;
 import pe.edu.utp.backend.student.model.Student.Status;
 import pe.edu.utp.backend.student.model.Student.Modality;

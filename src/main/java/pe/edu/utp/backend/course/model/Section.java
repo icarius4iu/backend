@@ -1,10 +1,7 @@
 package pe.edu.utp.backend.course.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pe.edu.utp.backend.content.model.Content;
 import pe.edu.utp.backend.student.model.Student;
 
@@ -15,10 +12,13 @@ import java.util.Set;
 
 @Entity
 @Table(name = "sections")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"course", "professors", "students", "weeks", "contents"})
+@EqualsAndHashCode(exclude = {"course", "professors", "students", "weeks", "contents"})
 public class Section {
 
     @Id
@@ -66,6 +66,7 @@ public class Section {
 
     @OneToMany(mappedBy = "section")
     private List<Content> contents = new ArrayList<>();
+
     /**
      * Añade una semana a la sección
      */

@@ -34,16 +34,16 @@ VALUES
 
 -- Insertar perfiles de estudiantes
 INSERT INTO student_profiles (id, student_id, photo_url, student_code, full_name, status,
-                              faculty, modality, document_type, document_number, mobile_phone, personal_email, address, last_updated)
+                              faculty, modality, document_type, document_number, mobile_phone, personal_email, last_updated)
 VALUES
     (1, 1, 'https://example.com/photos/juan.jpg', 'U20190123', 'Juan Pérez García', 'Activo',
      'Ingeniería', 'Presencial', 'DNI', '12345678', '987654321', 'juan.perez@example.com',
-     'Av. Los Pinos 123, San Borja, Lima, Lima', '2025-06-01 10:30:00'),
+     '2025-06-01 10:30:00'),
 
     (2, 2, 'https://example.com/photos/maria.jpg', 'U20200456', 'María López Sánchez', 'Activo',
      'Medicina', 'Presencial', 'DNI', '87654321', '912345678', 'maria.lopez@example.com',
-     'Jr. Las Flores 456, Miraflores, Lima, Lima', '2025-06-02 11:45:00'),
+     '2025-06-02 11:45:00'),
 
     (3, 3, 'https://example.com/photos/carlos.jpg', 'U20180789', 'Carlos García Martínez', 'Egresado',
      'Derecho', 'Semipresencial', 'PASSPORT', 'AB123456', '956781234', 'carlos.garcia@example.com',
-     'Calle Los Olivos 789, San Isidro, Lima, Lima', '2025-06-03 09:15:00');
+     '2025-06-03 09:15:00');

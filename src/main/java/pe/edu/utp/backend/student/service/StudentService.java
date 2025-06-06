@@ -1,12 +1,11 @@
 package pe.edu.utp.backend.student.service;
 
-import pe.edu.utp.backend.career.model.Career;
+import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.student.model.Student;
 import pe.edu.utp.backend.student.model.Student.Status;
 import pe.edu.utp.backend.student.model.Student.Modality;
 import pe.edu.utp.backend.student.model.StudentInformation;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

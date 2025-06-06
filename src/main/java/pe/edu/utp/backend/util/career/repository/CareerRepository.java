@@ -1,8 +1,8 @@
-package pe.edu.utp.backend.career.repository;
+package pe.edu.utp.backend.util.career.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import pe.edu.utp.backend.career.model.Career;
+import pe.edu.utp.backend.util.career.model.Career;
 
 import java.util.List;
 import java.util.Optional;

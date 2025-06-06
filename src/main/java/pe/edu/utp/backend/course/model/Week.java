@@ -1,10 +1,7 @@
 package pe.edu.utp.backend.course.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pe.edu.utp.backend.content.model.Content;
 
 import java.time.LocalDate;
@@ -13,10 +10,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "weeks")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"section", "sessions", "contents"})
+@EqualsAndHashCode(exclude = {"section", "sessions", "contents"})
 public class Week {
 
     @Id
@@ -28,9 +28,9 @@ public class Week {
     private Section section;
 
     @Column(nullable = false)
-    private Integer weekNumber; // Número de semana (1-18 para regular, 1-10 para verano)
+    private Integer weekNumber; // Número de semanas (1-18 para regular, 1-10 para verano)
 
-    private String title; // Título opcional de la semana (ej: "Semana 11")
+    private String title; // Título opcional de la semana (ej.: "Semana 11")
 
     private String description; // Descripción de los temas de la semana
 

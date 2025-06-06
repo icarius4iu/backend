@@ -3,7 +3,7 @@ package pe.edu.utp.backend.student.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pe.edu.utp.backend.career.model.Career;
+import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.student.model.Student;
 import pe.edu.utp.backend.student.model.Student.Status;
 import pe.edu.utp.backend.student.model.Student.Modality;
@@ -12,7 +12,6 @@ import pe.edu.utp.backend.student.repository.StudentRepository;
 import pe.edu.utp.backend.student.service.StudentInformationService;
 import pe.edu.utp.backend.student.service.StudentService;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

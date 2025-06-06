@@ -1,4 +1,4 @@
-package pe.edu.utp.backend.util;
+package pe.edu.utp.backend.util.cicle;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
