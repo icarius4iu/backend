@@ -15,7 +15,7 @@ import pe.edu.utp.backend.student.repository.StudentProfileRepository;
 import pe.edu.utp.backend.student.repository.StudentRepository;
 import pe.edu.utp.backend.student.service.StudentProfileService;
 import pe.edu.utp.backend.student.service.StudentService;
-import pe.edu.utp.backend.util.cicle.Cicle;
+import pe.edu.utp.backend.util.cicle.model.Cicle;
 import pe.edu.utp.backend.util.cicle.repository.CicleRepository;
 
 import java.time.LocalDate;

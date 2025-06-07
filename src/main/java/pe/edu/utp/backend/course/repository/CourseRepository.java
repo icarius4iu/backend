@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.course.model.Course;
 import pe.edu.utp.backend.course.model.Course.CourseType;
-import pe.edu.utp.backend.util.cicle.Cicle;
+import pe.edu.utp.backend.util.cicle.model.Cicle;
 
 import java.util.List;
 import java.util.Optional;

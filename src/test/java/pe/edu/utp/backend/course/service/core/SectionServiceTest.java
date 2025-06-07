@@ -14,7 +14,7 @@ import pe.edu.utp.backend.course.model.Week;
 import pe.edu.utp.backend.course.repository.CourseRepository;
 import pe.edu.utp.backend.course.repository.SectionRepository;
 import pe.edu.utp.backend.student.model.Student;
-import pe.edu.utp.backend.util.cicle.Cicle;
+import pe.edu.utp.backend.util.cicle.model.Cicle;
 
 import java.time.LocalDate;
 import java.util.*;

@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package pe.edu.utp.auth;
+
+option java_multiple_files = true;
+option java_package = "pe.edu.utp.backend.auth.grpc";
+
+// Servicio de autenticación
+service AuthService {
+  // Método para iniciar sesión
+  rpc Login (LoginRequest) returns (LoginResponse) {}
+
+  // Método para verificar un token
+  rpc VerifyToken (VerifyTokenRequest) returns (VerifyTokenResponse) {}
+}
+
+// Solicitud de inicio de sesión
+message LoginRequest {
+  string student_code = 1; // Código de estudiante
+  string password = 2;     // Contraseña
+}
+
+// Respuesta de inicio de sesión
+message LoginResponse {
+  bool success = 1;           // Si la autenticación fue exitosa
+  string token = 2;           // Token JWT
+  string email = 3;           // Correo electrónico institucional
+  string uid = 4;             // UID en Firebase
+  string name = 5;            // Nombre completo del estudiante
+  string student_code = 6;    // Código de estudiante
+  string career = 7;          // Carrera del estudiante
+  string error_message = 8;   // Mensaje de error (si success es false)
+}
+
+// Solicitud de verificación de token
+message VerifyTokenRequest {
+  string token = 1;  // Token JWT
+}
+
+// Respuesta de verificación de token
+message VerifyTokenResponse {
+  bool success = 1;        // Si el token es válido
+  string message = 2;      // Mensaje informativo
+  string user_id = 3;      // ID del usuario (si success es true)
+}

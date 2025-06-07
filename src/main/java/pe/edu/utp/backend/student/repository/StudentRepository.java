@@ -17,6 +17,17 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
     /**
+     * Verifica si existe un estudiante con el código especificado
+     */
+    boolean existsByStudentCode(String studentCode);
+
+    /**
+     * Verifica si existe un estudiante con el número de documento especificado
+     */
+    @Query("SELECT COUNT(s) > 0 FROM Student s JOIN s.information i WHERE i.documentNumber = :documentNumber")
+    boolean existsByInformationDocumentNumber(@Param("documentNumber") String documentNumber);
+
+    /**
      * Busca estudiante por código
      */
     Optional<Student> findByStudentCode(String studentCode);

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.content.model.Content;
-import pe.edu.utp.backend.util.cicle.Cicle;
+import pe.edu.utp.backend.util.cicle.model.Cicle;
 
 import java.util.ArrayList;
 import java.util.HashSet;

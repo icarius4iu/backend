@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthRequestDTO {
-    private String studentCode;  // Código de estudiante
-    private String password;     // Contraseña
+public class RegisterResponseDTO {
+    private boolean success;
+    private String studentCode;
+    private String message;
 }

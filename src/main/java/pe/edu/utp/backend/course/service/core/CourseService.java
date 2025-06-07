@@ -12,7 +12,7 @@ import pe.edu.utp.backend.course.model.Course;
 import pe.edu.utp.backend.course.repository.CourseRepository;
 import pe.edu.utp.backend.course.service.base.BaseAcademicService;
 import pe.edu.utp.backend.course.validator.CourseValidator;
-import pe.edu.utp.backend.util.cicle.Cicle;
+import pe.edu.utp.backend.util.cicle.model.Cicle;
 import pe.edu.utp.backend.util.cicle.repository.CicleRepository;
 
 

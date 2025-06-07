@@ -21,7 +21,7 @@ import pe.edu.utp.backend.course.service.composite.CourseManagementService;
 import pe.edu.utp.backend.course.service.core.CourseService;
 import pe.edu.utp.backend.course.service.core.ProfessorService;
 import pe.edu.utp.backend.course.service.core.SectionService;
-import pe.edu.utp.backend.util.cicle.Cicle;
+import pe.edu.utp.backend.util.cicle.model.Cicle;
 import pe.edu.utp.backend.util.cicle.repository.CicleRepository;
 
 import java.time.LocalDate;

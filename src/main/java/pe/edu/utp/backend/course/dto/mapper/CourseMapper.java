@@ -5,7 +5,7 @@ import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.course.dto.request.CourseCreationRequest;
 import pe.edu.utp.backend.course.dto.response.CourseDTO;
 import pe.edu.utp.backend.course.model.Course;
-import pe.edu.utp.backend.util.cicle.Cicle;
+import pe.edu.utp.backend.util.cicle.model.Cicle;
 
 import java.util.Set;
 
