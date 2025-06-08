@@ -106,4 +106,8 @@ public interface StudentService {
      * Verifica si existe un estudiante con el código proporcionado
      */
     boolean existsByStudentCode(String studentCode);
+
+    Optional<Student> findStudentWithSections(Long id);
+
+    List<Student> findStudentsBySection(Long sectionId);
 }

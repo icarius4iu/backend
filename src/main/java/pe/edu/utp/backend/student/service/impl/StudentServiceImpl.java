@@ -182,4 +182,16 @@ public class StudentServiceImpl implements StudentService {
     public boolean existsByStudentCode(String studentCode) {
         return studentRepository.findByStudentCode(studentCode).isPresent();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Student> findStudentWithSections(Long id) {
+        return studentRepository.findStudentWithSections(id);
+    }
+
+    @Override
+    public List<Student> findStudentsBySection(Long sectionId) {
+        return List.of();
+    }
+
 }

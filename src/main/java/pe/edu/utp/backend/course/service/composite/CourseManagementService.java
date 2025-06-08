@@ -3,6 +3,7 @@ package pe.edu.utp.backend.course.service.composite;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pe.edu.utp.backend.course.dto.SectionCreateDTO;
 import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.util.career.repository.CareerRepository;
 import pe.edu.utp.backend.course.dto.request.CourseCreationRequest;
@@ -48,11 +49,15 @@ public class CourseManagementService {
     /**
      * Crea un curso completo con secciones y asigna profesores
      */
+
     public Course createCourseWithSections(
             CourseCreationRequest courseRequest,
             int numSections,
             int maxStudentsPerSection,
-            List<Long> professorIds) {
+            List<Long> professorIds,
+            Long cicleId,    // Añadir cicleId como parámetro
+            int weeksCount,  // Añadir el número de semanas
+            int sessionsPerWeek) {  // Añadir sesiones por semana
 
         // 1. Crear el curso
         CourseDTO courseDTO = courseService.createCourseFromRequest(courseRequest);
@@ -63,17 +68,22 @@ public class CourseManagementService {
             // Crear sección con letra (A, B, C, etc.)
             String sectionCode = String.valueOf((char) ('A' + i));
 
-            Section section = Section.builder()
+            // Usar SectionCreateDTO en lugar de Section
+            SectionCreateDTO sectionDTO = SectionCreateDTO.builder()
                     .code(sectionCode)
-                    .course(course)
+                    .courseId(course.getId())
+                    .cicleId(cicleId)
                     .maxStudents(maxStudentsPerSection)
+                    .weeksCount(weeksCount)
+                    .sessionsPerWeek(sessionsPerWeek)
+                    .virtualMeetingUrl("https://meet.utp.edu.pe/" + course.getCode() + "-" + sectionCode)
                     .build();
 
-            // Guardar sección
-            Section savedSection = sectionService.createSection(section);
+            // Guardar sección usando el nuevo método
+            Section savedSection = sectionService.createCompleteSection(sectionDTO);
 
-            // Generar semanas automaticamente
-            sectionService.generateWeeks(savedSection.getId());
+            // No es necesario generar semanas, ya se generan en createCompleteSection
+            // sectionService.generateWeeks(savedSection.getId());
 
             // Agregar la sección al curso
             course.addSection(savedSection);
@@ -86,7 +96,6 @@ public class CourseManagementService {
 
         return courseService.save(course);
     }
-
     /**
      * Asigna profesores a las secciones del curso
      */

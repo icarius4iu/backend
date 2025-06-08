@@ -1,10 +1,10 @@
 package pe.edu.utp.backend.schedule.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pe.edu.utp.backend.course.model.Section;
 import pe.edu.utp.backend.course.model.Session;
 
@@ -14,15 +14,17 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "schedule_entries")
-@Data
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"studentSchedule", "section", "session"})
+@EqualsAndHashCode(of = {"id"})
 public class ScheduleEntry {
 
-    /**
-     * Tipos de eventos en el horario
-     */
+
+
     public enum EntryType {
         CLASS_SESSION("Sesión de clase"),
         EXAM("Evaluación"),
@@ -46,6 +48,7 @@ public class ScheduleEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties("entries")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_schedule_id", nullable = false)
     private StudentSchedule studentSchedule;
@@ -77,7 +80,6 @@ public class ScheduleEntry {
     private LocalTime endTime;
 
     private String location;
-
     private String meetingUrl;
 
     @Enumerated(EnumType.STRING)
@@ -96,25 +98,39 @@ public class ScheduleEntry {
     @Column(name = "is_reminded")
     private Boolean reminded;
 
-    /**
-     * Determina si el evento es una evaluación
-     */
+    // Nuevos campos para mejorar la visualización
+    @Column(name = "course_code")
+    private String courseCode;
+
+    @Column(name = "course_name")
+    private String courseName;
+
+    @Column(name = "section_code")
+    private String sectionCode;
+
+
+
     public boolean isEvaluation() {
         return entryType == EntryType.EXAM ||
                 (hasEvaluation != null && hasEvaluation);
     }
 
     /**
-     * Genera información de ubicación completa
+     * Genera información de ubicación completa según la modalidad de la sección.
      */
     public String getFullLocation() {
-        if (section != null && section.getCourse() != null) {
-            if (section.getCourse().isRealTimeAttendance()) {
-                return location;
-            } else {
-                return meetingUrl;
+        if (section != null && section.getModality() != null) {
+            switch (section.getModality()) {
+                case PRESENCIAL:
+                case VIRTUAL_VIVO:
+                    return location;
+                case VIRTUAL_24_7:
+                    return meetingUrl;
             }
         }
         return location != null ? location : meetingUrl;
+    }
+    public void setSessionDate(LocalDate newDate) {
+        this.date = newDate;
     }
 }

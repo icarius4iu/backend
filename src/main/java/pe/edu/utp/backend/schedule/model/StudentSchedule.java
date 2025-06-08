@@ -1,10 +1,10 @@
 package pe.edu.utp.backend.schedule.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pe.edu.utp.backend.student.model.Student;
 
 import java.time.LocalDateTime;
@@ -13,23 +13,30 @@ import java.util.Set;
 
 @Entity
 @Table(name = "student_schedules")
-@Data
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentSchedule {
+@ToString(exclude = {"entries", "student"}) // Excluir referencias bidireccionales
+@EqualsAndHashCode(of = {"id"}) // Usar SOLO el ID para hashCode y equals
+public class    StudentSchedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties({"information", "schedule"})
     @OneToOne
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
+    @JsonIgnoreProperties("studentSchedule")
     @OneToMany(mappedBy = "studentSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<ScheduleEntry> entries = new HashSet<>();
+
+
 
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated;

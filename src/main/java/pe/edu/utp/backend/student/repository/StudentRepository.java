@@ -100,4 +100,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
      */
     @Query("SELECT s.modality, COUNT(s) FROM Student s GROUP BY s.modality")
     List<Object[]> countByModality();
+
+
+
+
+    @Query("SELECT DISTINCT s FROM Student s LEFT JOIN FETCH s.sections WHERE s.id = :id")
+    Optional<Student> findStudentWithSections(@Param("id") Long id);
 }

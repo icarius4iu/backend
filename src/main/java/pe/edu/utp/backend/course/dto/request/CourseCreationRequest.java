@@ -24,9 +24,6 @@ public class CourseCreationRequest {
 
     private String description;
 
-    @NotNull(message = "El tipo de curso es obligatorio")
-    private Course.CourseType type;
-
     @NotNull(message = "El número de créditos es obligatorio")
     @Min(value = 1, message = "El número de créditos debe ser al menos 1")
     private Integer credits;

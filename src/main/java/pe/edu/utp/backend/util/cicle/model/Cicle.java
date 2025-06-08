@@ -1,19 +1,21 @@
 package pe.edu.utp.backend.util.cicle.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import pe.edu.utp.backend.course.model.Section;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "cicles")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString // Safer than @Data
+@EqualsAndHashCode(of = {"id", "name"})
 public class Cicle {
     /**
      * Enum para representar los tipos de ciclo: REGULAR o VERANO
@@ -51,6 +53,7 @@ public class Cicle {
 
     @Column(nullable = false, unique = true)
     private String name;            // Nombre del ciclo (formato: "VERANO_2025" o "REGULAR_2025-I" o "REGULAR_2025-II")
+
 
     /**
      * Obtiene el número de semanas del ciclo según su tipo

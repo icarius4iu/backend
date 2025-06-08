@@ -1,19 +1,23 @@
 package pe.edu.utp.backend.student.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "student_information")
-@Data
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"student"})
+@EqualsAndHashCode(of = {"id"}) // Solo usar ID
 public class StudentInformation {
 
     /**
@@ -61,6 +65,7 @@ public class StudentInformation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties({"information", "schedule"})
     @OneToOne
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;

@@ -8,7 +8,9 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "sessions")
@@ -21,9 +23,8 @@ import java.util.List;
 @EqualsAndHashCode(exclude = {"week", "contents"})
 public class Session {
 
-    /**
-     * Tipo de sesión
-     */
+
+
     public enum SessionType {
         TEORIA("Teoría"),
         PRACTICA("Práctica"),
@@ -51,68 +52,65 @@ public class Session {
     private Week week;
 
     @Column(nullable = false)
-    private String title; // Título de la sesión
+    private String title;
 
     @Column(length = 2000)
-    private String description; // Descripción o contenido de la sesión
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SessionType type; // Tipo de sesión
+    private SessionType type;
 
-    @Column(nullable = false)
-    private LocalDate sessionDate; // Fecha específica de la sesión
+    @Column(name = "session_date", nullable = false)
+    private LocalDate sessionDate;
 
     @Enumerated(EnumType.STRING)
-    private DayOfWeek dayOfWeek; // Día de la semana
+    private DayOfWeek dayOfWeek;
 
-    private LocalTime startTime; // Hora de inicio
+    private LocalTime startTime;
+    private LocalTime endTime;
 
-    private LocalTime endTime; // Hora de fin
+    private String buildingName;
+    private String roomNumber;
 
-    // Atributos para sesiones presenciales
-    private String buildingName; // Nombre del edificio
-
-    private String roomNumber; // Número de aulas/laboratorio
-
-    // Atributos para sesiones virtuales
-    private String meetingUrl; // URL de la reunión virtual
-
-    private String meetingId; // id de la reunión
-
-    private String meetingPassword; // Contraseña de la reunión
+    private String meetingUrl;
+    private String meetingId;
+    private String meetingPassword;
 
     @OneToMany(mappedBy = "session")
     private List<Content> contents = new ArrayList<>();
 
-
-    /**
-     * Determina si la sesión es presencial
-     */
+    // Cambios aquí: Modalidad ya no está en Course, sino en Section.
     public boolean isPresencial() {
         return week != null &&
                 week.getSection() != null &&
-                week.getSection().getCourse() != null &&
-                week.getSection().getCourse().getType() == Course.CourseType.PRESENCIAL;
+                week.getSection().getModality() == Section.Modality.PRESENCIAL;
     }
 
-    /**
-     * Determina si la sesión es virtual en vivo
-     */
     public boolean isVirtualVivo() {
         return week != null &&
                 week.getSection() != null &&
-                week.getSection().getCourse() != null &&
-                week.getSection().getCourse().getType() == Course.CourseType.VIRTUAL_VIVO;
+                week.getSection().getModality() == Section.Modality.VIRTUAL_VIVO;
     }
 
-    /**
-     * Determina si la sesión es virtual 24/7
-     */
     public boolean isVirtual247() {
         return week != null &&
                 week.getSection() != null &&
-                week.getSection().getCourse() != null &&
-                week.getSection().getCourse().getType() == Course.CourseType.VIRTUAL_24_7;
+                week.getSection().getModality() == Section.Modality.VIRTUAL_24_7;
+    }
+    public int getSessionNumber() {
+        if (week == null || week.getSessions() == null) {
+            return 0;
+        }
+        List<Session> orderedSessions = week.getSessions().stream()
+                .sorted(Comparator.comparing(Session::getSessionDate)) // o por startTime, como necesites
+                .toList();
+
+        for (int i = 0; i < orderedSessions.size(); i++) {
+            if (orderedSessions.get(i).getId().equals(this.id)) {
+                return i + 1;
+            }
+        }
+        return 0;
     }
 }

@@ -1,10 +1,10 @@
 package pe.edu.utp.backend.student.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.course.model.Section;
 import pe.edu.utp.backend.schedule.model.StudentSchedule;
@@ -15,11 +15,17 @@ import java.util.Set;
 
 @Entity
 @Table(name = "students")
-@Data
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"information", "sections", "schedule"})
+@EqualsAndHashCode(of = {"id", "studentCode"}) // Solo usar campos identificadores
+@JsonIgnoreProperties({"sections"})
 public class Student {
+
+
 
     /**
      * Estado del estudiante
@@ -91,6 +97,7 @@ public class Student {
     @Column(name = "last_enrollment_date")
     private LocalDate lastEnrollmentDate;
 
+    @JsonIgnoreProperties("student")
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private StudentInformation information;
 
@@ -100,6 +107,7 @@ public class Student {
     private Set<Section> sections = new HashSet<>();
 
     // Relación con el horario
+    @JsonIgnoreProperties("student")
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private StudentSchedule schedule;
 

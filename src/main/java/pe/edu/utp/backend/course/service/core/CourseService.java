@@ -15,7 +15,6 @@ import pe.edu.utp.backend.course.validator.CourseValidator;
 import pe.edu.utp.backend.util.cicle.model.Cicle;
 import pe.edu.utp.backend.util.cicle.repository.CicleRepository;
 
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -86,9 +85,7 @@ public class CourseService extends BaseAcademicService<Course, Long> {
         return save(course);
     }
 
-    public List<Course> findCoursesByType(Course.CourseType type) {
-        return getCourseRepository().findByType(type);
-    }
+    // Eliminado: findCoursesByType, ya que el tipo/modality ahora corresponde a Section
 
     public List<Course> findCoursesByCicle(Cicle cicle) {
         return getCourseRepository().findByCicle(cicle);

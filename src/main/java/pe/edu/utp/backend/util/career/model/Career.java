@@ -1,10 +1,7 @@
 package pe.edu.utp.backend.util.career.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pe.edu.utp.backend.course.model.Course;
 
 import java.util.HashSet;
@@ -12,10 +9,13 @@ import java.util.Set;
 
 @Entity
 @Table(name = "careers")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"courses"}) // Excluir colecciones
+@EqualsAndHashCode(of = {"id", "code"}) // Solo usar campos identificadores
 public class Career {
 
     @Id

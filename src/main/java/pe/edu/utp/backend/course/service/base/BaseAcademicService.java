@@ -1,5 +1,7 @@
 package pe.edu.utp.backend.course.service.base;
 
+import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +15,10 @@ import java.util.Optional;
 public abstract class BaseAcademicService<T, ID> {
 
     protected final JpaRepository<T, ID> repository;
+
+    @Autowired
+    protected EntityManager entityManager; // Si ya existe este campo, no necesitas inyectarlo nuevamente en WeekService
+
 
     protected BaseAcademicService(JpaRepository<T, ID> repository) {
         this.repository = repository;

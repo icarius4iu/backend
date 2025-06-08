@@ -15,7 +15,6 @@ public class CourseDTO {
     private String code;
     private String name;
     private String description;
-    private String type;
     private Integer credits;
     private Integer weeklyHours;
     private Long cicleId;

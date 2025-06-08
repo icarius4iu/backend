@@ -66,4 +66,14 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
      */
     @Query("SELECT s FROM Section s WHERE SIZE(s.students) * 100 / s.maxStudents >= :percentage")
     List<Section> findSectionsWithOccupancyPercentageGreaterThan(@Param("percentage") int percentage);
+
+    @Query("SELECT DISTINCT s FROM Section s " +
+            "LEFT JOIN FETCH s.weeks w " +
+            "LEFT JOIN FETCH w.sessions ses " +
+            "LEFT JOIN FETCH s.course c " +
+            "LEFT JOIN FETCH s.cicle " +
+            "WHERE s.id IN (SELECT ss.id FROM Student st JOIN st.sections ss WHERE st.id = :studentId)")
+    List<Section> findSectionsWithWeeksAndSessionsByStudentId(@Param("studentId") Long studentId);
+
+    Optional<Section> findByCourseAndCode(Course course, String sectionCode);
 }

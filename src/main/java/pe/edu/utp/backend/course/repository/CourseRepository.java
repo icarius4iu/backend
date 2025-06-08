@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import pe.edu.utp.backend.util.career.model.Career;
 import pe.edu.utp.backend.course.model.Course;
-import pe.edu.utp.backend.course.model.Course.CourseType;
 import pe.edu.utp.backend.util.cicle.model.Cicle;
 
 import java.util.List;
@@ -34,10 +33,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
      */
     List<Course> findByNameContainingIgnoreCase(String name);
 
-    /**
-     * Busca cursos por tipo (PRESENCIAL, VIRTUAL_VIVO, VIRTUAL_24_7)
-     */
-    List<Course> findByType(CourseType type);
+    // ELIMINADO: Búsqueda por tipo (CourseType), ya no corresponde
+    // List<Course> findByType(CourseType type);
 
     /**
      * Busca cursos por número de créditos
@@ -74,4 +71,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
      */
     @Query("SELECT DISTINCT c FROM Course c JOIN c.sections s WHERE s.maxStudents > SIZE(s.students)")
     List<Course> findCoursesWithAvailableSections();
+
+    /**
+     * Busca cursos que tengan alguna sección de la modalidad indicada
+     */
+    @Query("SELECT DISTINCT c FROM Course c JOIN c.sections s WHERE s.modality = :modality")
+    List<Course> findBySectionModality(pe.edu.utp.backend.course.model.Section.Modality modality);
+
 }

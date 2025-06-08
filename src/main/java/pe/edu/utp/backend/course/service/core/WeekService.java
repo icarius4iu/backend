@@ -1,5 +1,7 @@
 package pe.edu.utp.backend.course.service.core;
 
+import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.utp.backend.course.exception.InvalidAcademicEntityException;
@@ -11,6 +13,7 @@ import pe.edu.utp.backend.course.repository.WeekRepository;
 import pe.edu.utp.backend.course.service.base.BaseAcademicService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +22,9 @@ public class WeekService extends BaseAcademicService<Week, Long> {
 
     private final SectionRepository sectionRepository;
     private final SessionService sessionService;
+
+    @Autowired
+    private EntityManager entityManager; // AÑADIDO: Inyectar EntityManager
 
     public WeekService(WeekRepository weekRepository, SectionRepository sectionRepository, SessionService sessionService) {
         super(weekRepository);
@@ -80,14 +86,30 @@ public class WeekService extends BaseAcademicService<Week, Long> {
     }
 
     @Transactional
-    public Week removeSession(Long weekId, Long sessionId) {
-        Week week = getById(weekId);
-        Session session = sessionService.getById(sessionId);
+    public void deleteById(Long id) {
+        Week week = findById(id).orElse(null);
 
-        week.removeSession(session);
-        sessionService.deleteById(sessionId);
+        if (week != null) {
+            // Primero eliminar todas las sesiones asociadas
+            if (week.getSessions() != null) {
+                for (Session session : new ArrayList<>(week.getSessions())) {
+                    entityManager.remove(session);
+                }
 
-        return save(week);
+                // Limpiar la colección
+                week.getSessions().clear();
+            }
+
+            // Ahora sí eliminar la semana
+            repository.deleteById(id);
+        } else {
+            // Corregido: Usar parámetros posicionales (?) en lugar de nombrados (:weekId)
+            entityManager.createNativeQuery("DELETE FROM sessions WHERE week_id = ?")
+                    .setParameter(1, id)  // Cambio de "weekId" a 1 (primer parámetro)
+                    .executeUpdate();
+
+            repository.deleteById(id);
+        }
     }
 
     /**

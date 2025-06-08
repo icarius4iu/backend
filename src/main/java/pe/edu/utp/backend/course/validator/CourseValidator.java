@@ -27,9 +27,7 @@ public class CourseValidator {
             throw new InvalidAcademicEntityException("El nombre del curso es obligatorio");
         }
 
-        if (course.getType() == null) {
-            throw new InvalidAcademicEntityException("El tipo de curso es obligatorio");
-        }
+        // Eliminado: validación de tipo/modality, ya no corresponde a Course
 
         if (course.getCredits() == null || course.getCredits() <= 0) {
             throw new InvalidAcademicEntityException("El número de créditos debe ser un valor positivo");

@@ -19,34 +19,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"careers", "sections", "contents"})
-@EqualsAndHashCode(exclude = {"careers", "sections", "contents"})
+// CORRECTO: usar SOLO los campos identificadores
+@EqualsAndHashCode(of = {"id", "code"})
 public class Course {
-    /**
-     * Enum para representar los tipos de curso
-     */
-    public enum CourseType {
-        PRESENCIAL("Presencial"),
-        VIRTUAL_VIVO("Virtual en Vivo"),
-        VIRTUAL_24_7("Virtual 24/7");
 
-        private final String displayName;
-
-        CourseType(String displayName) {
-            this.displayName = displayName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        public boolean isRealTimeAttendance() {
-            return this == PRESENCIAL || this == VIRTUAL_VIVO;
-        }
-
-        public boolean isAsynchronous() {
-            return this == VIRTUAL_24_7;
-        }
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,10 +36,6 @@ public class Course {
 
     @Column(length = 2000)
     private String description;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CourseType type;
 
     @Column(nullable = false)
     private Integer credits;
@@ -93,19 +65,7 @@ public class Course {
     @OneToMany(mappedBy = "course")
     private List<Content> contents = new ArrayList<>();
 
-    /**
-     * Determina si el curso tiene asistencia presencial o en tiempo real
-     */
-    public boolean isRealTimeAttendance() {
-        return type != null && type.isRealTimeAttendance();
-    }
 
-    /**
-     * Determina si el curso es asincrónico (disponible 24/7)
-     */
-    public boolean isAsynchronous() {
-        return type != null && type.isAsynchronous();
-    }
 
     /**
      * Añade una carrera a este curso

@@ -8,6 +8,15 @@ import pe.edu.utp.backend.course.model.Week;
 
 import java.time.LocalDateTime;
 
+import lombok.Data;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "contents")
 public class Content {
@@ -66,6 +75,7 @@ public class Content {
 
     @Column(name = "is_published")
     private boolean published;  // Para controlar visibilidad
+
 
     // Enums encapsulados
     public enum ContentType {
